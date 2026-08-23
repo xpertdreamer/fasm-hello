@@ -2,6 +2,8 @@
 
 Before building the project, make sure the following dependencies are installed on your system:
 
-  - **GTK4**
+  - **raylib** (prebuilt not included)
+  - **raygui**
   - **make** 
-  - **pkgconf** (or `pkg-config`)
+  - **gcc**
+  - **fasm**
