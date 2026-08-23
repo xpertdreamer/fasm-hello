@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <raylib.h>
 
@@ -13,10 +14,13 @@
 #define BUTTON_HEIGHT (int)(WH / 8)
 #define BUTTON_Y WH - 50
 
-#define MSG_BOX_X (int)(WW/4)
-#define MSG_BOX_Y (int)(WH/3)
-#define MSG_BOX_W (int)(WW/2)
-#define MSG_BOX_H (int)(WH/4)
+#define GATE_RECT_X (int)(WW/4)
+#define GATE_RECT_Y (int)(WH/4)
+#define GATE_RECT_W (int)(WW/4)
+#define GATE_RECT_H (int)(WH/2)
+
+#define GATE_TEXT_X (int)(GATE_RECT_X + GATE_RECT_X/3)
+#define GATE_TEXT_Y (int)(GATE_RECT_Y + GATE_RECT_Y/3)
 
 typedef enum {
    GATE_AND = 0,
@@ -59,16 +63,49 @@ typedef struct {
         }                                       \
 } while(0)
 
+_Bool draw_gate(GATETYPE type, uint8_t inputs/* , Gate* ptr */) {
+    // TODO: allocate gate
+    // TODO: draw inputs
+    if (type < 0 || type > 2) {
+        fprintf(stderr, "Type '%d' is not supported\n", type);
+        return false;
+    }
+    /* if (ptr == NULL) { */
+    /*     fprintf(stderr, "Ptr is NULL"); */
+    /*     return false; */
+    /* } */
+    const char* str = NULL;
+    switch (type) {
+        case GATE_AND: {
+            str = "AND";
+            break;
+        }
+        case GATE_OR: {
+            str = "OR";
+            break;
+        }
+        case GATE_NOT: {
+            str = "NOT";
+            break;
+        }
+        default: return false;
+    }
+
+    DrawRectangle(GATE_RECT_X, GATE_RECT_Y, GATE_RECT_W, GATE_RECT_H, LIGHTGRAY);
+    DrawText(str, GATE_TEXT_X, GATE_TEXT_Y, 25, BLACK);
+    return true;
+}
+
 int main(void) {
     InitWindow(WW, WH, "fasm-hello");
     SetTargetFPS(24);
+    Gate* gate = NULL;
 
     Rectangle or  = { 0, BUTTON_Y, BUTTON_WIDTH, BUTTON_HEIGHT};
     Rectangle and = { BUTTON_WIDTH + 5, BUTTON_Y, BUTTON_WIDTH, BUTTON_HEIGHT };
     Rectangle not = {BUTTON_WIDTH * 2 + 10, BUTTON_Y, BUTTON_WIDTH, BUTTON_HEIGHT};
 
-    uint8_t clicked = 8;
-    _Bool show_msg_box = false;
+    uint8_t clicked = 0;
     while (!WindowShouldClose()) {
         BeginDrawing();
         ClearBackground(GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR)));
@@ -81,46 +118,9 @@ int main(void) {
         if (GuiButton(not, "NOT")) {
             clicked = GATE_NOT;
         }
-        switch (clicked) {
-            case GATE_OR: {
-                // TODO: draw or
-                puts("OR clicked");
-                clicked = 8;
-                break;
-            }
-            case GATE_AND: {
-                // TODO: draw and
-                puts("AND clicked");
-                clicked = 8;
-                break;
-            }
-            case GATE_NOT: {
-                // TODO: draw not
-                puts("NOT clicked");
-                clicked = 8;
-                break;
-            }
-            case 8: break;
-            default: {
-                show_msg_box = clicked;
-                clicked = 8;
-                break;
-            }
+        if (!draw_gate(clicked, 0)) {
+            // TODO: handle error
         }
-        if (show_msg_box == true) {
-            int btnActive = -1;
-            GuiMessageBox((Rectangle){MSG_BOX_X, MSG_BOX_Y, MSG_BOX_W, MSG_BOX_H},
-                          GuiIconText(ICON_CROSS, "Unknown"),
-                          "Unknown element occured!",
-                          "OK",
-                          &btnActive
-                          );
-            if (btnActive >= 0) {
-                show_msg_box = false;
-                clicked = 8;
-            }
-        }
-
         EndDrawing();
     }
 }
