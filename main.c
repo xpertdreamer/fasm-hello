@@ -45,8 +45,6 @@ typedef struct {
             free(ptr);                          \
             (ptr) = NULL;                       \
         }                                       \
-    free(ptr);                                  \
-    (ptr) = NULL;                               \
 } while(0)
 
 int main(void) {
