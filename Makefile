@@ -1,12 +1,14 @@
-.PHONY: all clean
+.PHONY: hi clean
 
-all: main
+hi: hello
 
-clean:
-	rm -f main main.o
+clean_hi:
+	rm -rf build/
 
-main: main.o
-	ld main.o -o main
+hello: hello.o
+	ld build/hello.o -o build/hello
+	rm -f build/hello.o
 
-main.o: main.asm
-	fasm main.asm main.o
+hello.o: hello.asm
+	@mkdir -p build/
+	fasm hello.asm build/hello.o
