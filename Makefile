@@ -2,7 +2,7 @@
 
 hi: hello
 
-clean_hi:
+clean:
 	rm -rf build/
 
 hello: hello.o
