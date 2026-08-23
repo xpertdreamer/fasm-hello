@@ -1,4 +1,11 @@
-.PHONY: hi clean
+.PHONY: hi clean all run
+
+all: fasm-test
+
+fasm-test: main.c
+	@mkdir -p build/
+	gcc main.c -o build/fasm-test -lraylib -lm
+	./build/fasm-test
 
 hi: hello
 
