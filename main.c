@@ -30,6 +30,11 @@
 
 #define AND_INPUTS_COUNT 2
 
+#define INPUT_LINE_START_X (int)(GATE_RECT_X - WW / 5)
+#define INPUT1_LINE_START_Y GATE_RECT_Y * 1.5
+#define INPUT2_LINE_START_Y GATE_RECT_Y * 2.5
+#define BUTTON_S (int)(WW / 10)
+
 typedef enum {
    GATE_AND = 0,
    GATE_OR = 1,
@@ -83,8 +88,8 @@ void draw_inputs(Gate *ptr) {
         DrawLine(GATE_RECT_X - WW / 5, GATE_RECT_Y * 2, GATE_RECT_X, GATE_RECT_Y * 2, ptr->inputs[0] ? GREEN : RED);
         return;
     }
-    DrawLine(GATE_RECT_X - WW / 5, GATE_RECT_Y * 1.5, GATE_RECT_X, GATE_RECT_Y * 1.5, ptr->inputs[0] ? GREEN : RED);
-    DrawLine(GATE_RECT_X - WW / 5, GATE_RECT_Y * 2.5, GATE_RECT_X, GATE_RECT_Y * 2.5, ptr->inputs[1] ? GREEN : RED);
+    DrawLine(INPUT_LINE_START_X, INPUT1_LINE_START_Y, GATE_RECT_X, GATE_RECT_Y * 1.5, ptr->inputs[0] ? GREEN : RED);
+    DrawLine(INPUT_LINE_START_X, INPUT2_LINE_START_Y, GATE_RECT_X, GATE_RECT_Y * 2.5, ptr->inputs[1] ? GREEN : RED);
     return;
 }
 
@@ -136,6 +141,8 @@ int main(void) {
     Rectangle or  = { 0, BUTTON_Y, BUTTON_WIDTH, BUTTON_HEIGHT};
     Rectangle and = { BUTTON_WIDTH + 5, BUTTON_Y, BUTTON_WIDTH, BUTTON_HEIGHT };
     Rectangle not = {BUTTON_WIDTH * 2 + 10, BUTTON_Y, BUTTON_WIDTH, BUTTON_HEIGHT};
+    Rectangle in1 = {INPUT_LINE_START_X - 50, INPUT1_LINE_START_Y - 25, BUTTON_S, BUTTON_S};
+    Rectangle in2 = {INPUT_LINE_START_X - 50, INPUT2_LINE_START_Y - 25, BUTTON_S, BUTTON_S};
 
     while (!WindowShouldClose()) {
         BeginDrawing();
@@ -143,6 +150,10 @@ int main(void) {
         if (GuiButton(or, "OR")) gate->type = GATE_OR;
         if (GuiButton(and, "AND")) gate->type = GATE_AND;
         if (GuiButton(not, "NOT")) gate->type = GATE_NOT;
+        if (GuiButton(in1, gate->inputs[0] ? "1" : "0")) gate->inputs[0] = !gate->inputs[0];
+        if (gate->type != GATE_NOT) {
+            if (GuiButton(in2, gate->inputs[1] ? "1" : "0")) gate->inputs[1] = !gate->inputs[1];
+        }
         if (!draw_gate(gate)) {
             fprintf(stderr, "ERROR: Failed to draw gate\n");
             goto end;
