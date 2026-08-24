@@ -2,9 +2,10 @@
 
 all: fasm-test
 
-fasm-test: main.c
+fasm-test: main.c extern.asm
 	@mkdir -p build/
-	gcc -Wall -Wextra -isystem thirdparty main.c -o build/fasm-test -lraylib -lm
+	fasm extern.asm build/extern.o
+	gcc -Wall -Wextra -isystem thirdparty main.c build/extern.o -o build/fasm-test -lraylib -lm
 	./build/fasm-test
 
 hi: hello

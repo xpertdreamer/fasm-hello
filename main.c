@@ -51,11 +51,12 @@ typedef struct {
     (ptr)->inputs = (_Bool*)malloc((_input) * sizeof(_Bool));           \
     if ((ptr)->inputs == NULL) {                                        \
         fprintf(stderr, "Inputs allocation failed\n");                  \
-        free((ptr)->inputs);                                            \
         free(ptr);                                                      \
         exit(EXIT_FAILURE);                                             \
     }                                                                   \
     (ptr)->type = (_type);                                              \
+    (ptr)->inputs[0] = false;                                           \
+    if (_input > 1) (ptr)->inputs[1] = true;                            \
 } while (0)
 
 #define FREE_GATE(ptr) do {                     \
@@ -69,16 +70,16 @@ typedef struct {
         }                                       \
 } while(0)
 
+extern _Bool compute(GATETYPE type, _Bool *inputs);
+
 void draw_inputs(GATETYPE type) {
     if (type == GATE_NOT) {
         DrawCircleLines(GATE_RECT_X, GATE_RECT_Y * 2, RADIUS, GRAY);
         DrawLine(GATE_RECT_X - WW / 5, GATE_RECT_Y * 2, GATE_RECT_X, GATE_RECT_Y * 2, GRAY);
         return;
     }
-
     DrawLine(GATE_RECT_X - WW / 5, GATE_RECT_Y * 1.5, GATE_RECT_X, GATE_RECT_Y * 1.5, GRAY);
     DrawLine(GATE_RECT_X - WW / 5, GATE_RECT_Y * 2.5, GATE_RECT_X, GATE_RECT_Y * 2.5, GRAY);
-
     return;
 }
 
@@ -109,20 +110,22 @@ _Bool draw_gate(Gate* ptr) {
         default: return false;
     }
 
+    ptr->output = compute(type, ptr->inputs);
     DrawRectangle(GATE_RECT_X, GATE_RECT_Y, GATE_RECT_W, GATE_RECT_H, LIGHTGRAY);
     DrawText(str, GATE_TEXT_X, GATE_TEXT_Y, 25, BLACK);
-    DrawLine(LINE_X_START, LINE_Y, LINE_X_END, LINE_Y, GRAY);
+    DrawLine(LINE_X_START, LINE_Y, LINE_X_END, LINE_Y, ptr->output == true ? GREEN : RED);
     draw_inputs(ptr->type);
 
     return true;
 }
 
 int main(void) {
+    int exit_code = 0;
+
     InitWindow(WW, WH, "fasm-hello");
     SetTargetFPS(24);
 
     Gate* gate = NULL;
-    int exit_code = 0;
     ALLOC_GATE(gate, GATE_AND, AND_INPUTS_COUNT);
 
     Rectangle or  = { 0, BUTTON_Y, BUTTON_WIDTH, BUTTON_HEIGHT};
