@@ -26,6 +26,9 @@
 #define LINE_Y       (GATE_RECT_Y * 2)
 #define LINE_X_END   (int)(LINE_X_START + WW/5)
 
+#define NOT_INPUTS_COUNT    1
+#define AND_OR_INPUTS_COUNT 2
+
 typedef enum {
    GATE_AND = 0,
    GATE_OR = 1,
@@ -34,9 +37,6 @@ typedef enum {
 
 typedef struct {
     GATETYPE type;
-    int x;
-    int y;
-    uint8_t inputs_count;
     _Bool output;
     _Bool *inputs;
 } Gate;
@@ -47,7 +47,6 @@ typedef struct {
         fprintf(stderr, "Gate allocation failed\n");            \
         exit(EXIT_FAILURE);                                     \
     }                                                           \
-    (ptr)->inputs_count = (input_c);                                    \
     (ptr)->inputs = (_Bool*)malloc((input_c) * sizeof(_Bool));          \
     if ((ptr)->inputs == NULL) {                                        \
         fprintf(stderr, "Inputs allocation failed\n");                  \
