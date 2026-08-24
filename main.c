@@ -41,18 +41,19 @@ typedef struct {
     _Bool *inputs;
 } Gate;
 
-#define ALLOC_GATE(ptr, type, input_c) do {                     \
+#define ALLOC_GATE(ptr, _type, _input) do {                     \
     ptr = (Gate*)malloc(sizeof(Gate));                          \
     if ((ptr) == NULL) {                                        \
         fprintf(stderr, "Gate allocation failed\n");            \
         exit(EXIT_FAILURE);                                     \
     }                                                           \
-    (ptr)->inputs = (_Bool*)malloc((input_c) * sizeof(_Bool));          \
+    (ptr)->inputs = (_Bool*)malloc((_input) * sizeof(_Bool));           \
     if ((ptr)->inputs == NULL) {                                        \
         fprintf(stderr, "Inputs allocation failed\n");                  \
         free(ptr);                                                      \
         exit(EXIT_FAILURE);                                             \
     }                                                                   \
+    (ptr)->type = (_type);                                              \
 } while (0)
 
 #define FREE_GATE(ptr) do {                     \
@@ -66,8 +67,9 @@ typedef struct {
         }                                       \
 } while(0)
 
-_Bool draw_gate(GATETYPE type , Gate* ptr) {
+_Bool draw_gate(Gate* ptr) {
     // TODO: draw inputs
+    GATETYPE type = ptr->type;
     if (type < 0 || type > 2) {
         fprintf(stderr, "Type '%d' is not supported\n", type);
         return false;
@@ -112,20 +114,19 @@ int main(void) {
     Rectangle and = { BUTTON_WIDTH + 5, BUTTON_Y, BUTTON_WIDTH, BUTTON_HEIGHT };
     Rectangle not = {BUTTON_WIDTH * 2 + 10, BUTTON_Y, BUTTON_WIDTH, BUTTON_HEIGHT};
 
-    uint8_t clicked = 0;
     while (!WindowShouldClose()) {
         BeginDrawing();
         ClearBackground(GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR)));
         if (GuiButton(or, "OR")) {
-            clicked = GATE_OR;
+            gate->type = GATE_OR;
         }
         if (GuiButton(and, "AND")) {
-            clicked = GATE_AND;
+            gate->type = GATE_AND;
         }
         if (GuiButton(not, "NOT")) {
-            clicked = GATE_NOT;
+            gate->type = GATE_NOT;
         }
-        if (!draw_gate(clicked)) {
+        if (!draw_gate(gate)) {
             // TODO: handle error
         }
         EndDrawing();
