@@ -122,6 +122,7 @@ int main(void) {
     SetTargetFPS(24);
 
     Gate* gate = NULL;
+    int exit_code = 0;
     ALLOC_GATE(gate, GATE_AND, AND_INPUTS_COUNT);
 
     Rectangle or  = { 0, BUTTON_Y, BUTTON_WIDTH, BUTTON_HEIGHT};
@@ -135,10 +136,14 @@ int main(void) {
         if (GuiButton(and, "AND")) gate->type = GATE_AND;
         if (GuiButton(not, "NOT")) gate->type = GATE_NOT;
         if (!draw_gate(gate)) {
-            // TODO: handle error
+            fprintf(stderr, "ERROR: Failed to draw gate\n");
+            goto end;
         }
         EndDrawing();
     }
 
+end:
     FREE_GATE(gate);
+    puts("Freed");
+    return exit_code;
 }
