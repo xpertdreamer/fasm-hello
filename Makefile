@@ -16,6 +16,7 @@ clean:
 hello: hello.o
 	ld build/hello.o -o build/hello
 	rm -f build/hello.o
+	./build/hello
 
 hello.o: hello.asm
 	@mkdir -p build/
