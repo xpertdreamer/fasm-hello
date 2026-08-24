@@ -66,17 +66,16 @@ typedef struct {
         }                                       \
 } while(0)
 
-_Bool draw_gate(GATETYPE type, uint8_t inputs/* , Gate* ptr */) {
-    // TODO: allocate gate
+_Bool draw_gate(GATETYPE type , Gate* ptr) {
     // TODO: draw inputs
     if (type < 0 || type > 2) {
         fprintf(stderr, "Type '%d' is not supported\n", type);
         return false;
     }
-    /* if (ptr == NULL) { */
-    /*     fprintf(stderr, "Ptr is NULL"); */
-    /*     return false; */
-    /* } */
+    if (ptr == NULL) {
+        fprintf(stderr, "Ptr is NULL");
+        return false;
+    }
     const char* str = NULL;
     switch (type) {
         case GATE_AND: {
@@ -94,6 +93,8 @@ _Bool draw_gate(GATETYPE type, uint8_t inputs/* , Gate* ptr */) {
         default: return false;
     }
 
+
+
     DrawRectangle(GATE_RECT_X, GATE_RECT_Y, GATE_RECT_W, GATE_RECT_H, LIGHTGRAY);
     DrawText(str, GATE_TEXT_X, GATE_TEXT_Y, 25, BLACK);
     DrawLine(LINE_X_START, LINE_Y, LINE_X_END, LINE_Y, GRAY);
@@ -103,7 +104,9 @@ _Bool draw_gate(GATETYPE type, uint8_t inputs/* , Gate* ptr */) {
 int main(void) {
     InitWindow(WW, WH, "fasm-hello");
     SetTargetFPS(24);
+
     Gate* gate = NULL;
+    ALLOC_GATE(gate, GATE_AND, AND_OR_INPUTS_COUNT);
 
     Rectangle or  = { 0, BUTTON_Y, BUTTON_WIDTH, BUTTON_HEIGHT};
     Rectangle and = { BUTTON_WIDTH + 5, BUTTON_Y, BUTTON_WIDTH, BUTTON_HEIGHT };
@@ -122,9 +125,11 @@ int main(void) {
         if (GuiButton(not, "NOT")) {
             clicked = GATE_NOT;
         }
-        if (!draw_gate(clicked, 0)) {
+        if (!draw_gate(clicked)) {
             // TODO: handle error
         }
         EndDrawing();
     }
+
+    FREE_GATE(gate);
 }
