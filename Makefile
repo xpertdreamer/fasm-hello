@@ -4,7 +4,7 @@ all: fasm-test
 
 fasm-test: main.c
 	@mkdir -p build/
-	gcc main.c -o build/fasm-test -lraylib -lm
+	gcc -Wall -Wextra -isystem thirdparty main.c -o build/fasm-test -lraylib -lm
 	./build/fasm-test
 
 hi: hello

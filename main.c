@@ -5,7 +5,7 @@
 #include <raylib.h>
 
 #define RAYGUI_IMPLEMENTATION
-#include "thirdparty/raygui.h"
+#include <raygui.h>
 
 #define WW 400
 #define WH 400
