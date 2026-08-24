@@ -72,14 +72,19 @@ typedef struct {
 
 extern _Bool compute(GATETYPE type, _Bool *inputs);
 
-void draw_inputs(GATETYPE type) {
-    if (type == GATE_NOT) {
-        DrawCircleLines(GATE_RECT_X, GATE_RECT_Y * 2, RADIUS, GRAY);
-        DrawLine(GATE_RECT_X - WW / 5, GATE_RECT_Y * 2, GATE_RECT_X, GATE_RECT_Y * 2, GRAY);
+void draw_inputs(Gate *ptr) {
+    if (ptr == NULL) {
+        fprintf(stderr, "Ptr is NULL (draw_inputs)\n");
         return;
     }
-    DrawLine(GATE_RECT_X - WW / 5, GATE_RECT_Y * 1.5, GATE_RECT_X, GATE_RECT_Y * 1.5, GRAY);
-    DrawLine(GATE_RECT_X - WW / 5, GATE_RECT_Y * 2.5, GATE_RECT_X, GATE_RECT_Y * 2.5, GRAY);
+    GATETYPE type = ptr->type;
+    if (type == GATE_NOT) {
+        DrawCircleLines(GATE_RECT_X, GATE_RECT_Y * 2, RADIUS, GRAY);
+        DrawLine(GATE_RECT_X - WW / 5, GATE_RECT_Y * 2, GATE_RECT_X, GATE_RECT_Y * 2, ptr->inputs[0] ? GREEN : RED);
+        return;
+    }
+    DrawLine(GATE_RECT_X - WW / 5, GATE_RECT_Y * 1.5, GATE_RECT_X, GATE_RECT_Y * 1.5, ptr->inputs[0] ? GREEN : RED);
+    DrawLine(GATE_RECT_X - WW / 5, GATE_RECT_Y * 2.5, GATE_RECT_X, GATE_RECT_Y * 2.5, ptr->inputs[1] ? GREEN : RED);
     return;
 }
 
@@ -114,7 +119,7 @@ _Bool draw_gate(Gate* ptr) {
     DrawRectangle(GATE_RECT_X, GATE_RECT_Y, GATE_RECT_W, GATE_RECT_H, LIGHTGRAY);
     DrawText(str, GATE_TEXT_X, GATE_TEXT_Y, 25, BLACK);
     DrawLine(LINE_X_START, LINE_Y, LINE_X_END, LINE_Y, ptr->output == true ? GREEN : RED);
-    draw_inputs(ptr->type);
+    draw_inputs(ptr);
 
     return true;
 }
