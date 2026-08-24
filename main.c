@@ -22,6 +22,10 @@
 #define GATE_TEXT_X (int)(GATE_RECT_X + GATE_RECT_X/3)
 #define GATE_TEXT_Y (int)(GATE_RECT_Y + GATE_RECT_Y/3)
 
+#define LINE_X_START (GATE_RECT_X + GATE_RECT_W)
+#define LINE_Y       (GATE_RECT_Y * 2)
+#define LINE_X_END   (int)(LINE_X_START + WW/5)
+
 typedef enum {
    GATE_AND = 0,
    GATE_OR = 1,
@@ -93,6 +97,7 @@ _Bool draw_gate(GATETYPE type, uint8_t inputs/* , Gate* ptr */) {
 
     DrawRectangle(GATE_RECT_X, GATE_RECT_Y, GATE_RECT_W, GATE_RECT_H, LIGHTGRAY);
     DrawText(str, GATE_TEXT_X, GATE_TEXT_Y, 25, BLACK);
+    DrawLine(LINE_X_START, LINE_Y, LINE_X_END, LINE_Y, GRAY);
     return true;
 }
 
