@@ -14,20 +14,21 @@
 #define BUTTON_HEIGHT (int)(WH / 8)
 #define BUTTON_Y WH - 50
 
-#define GATE_RECT_X (int)(WW/4)
+#define GATE_RECT_X (int)(WW/3)
 #define GATE_RECT_Y (int)(WH/4)
 #define GATE_RECT_W (int)(WW/4)
 #define GATE_RECT_H (int)(WH/2)
 
-#define GATE_TEXT_X (int)(GATE_RECT_X + GATE_RECT_X/3)
-#define GATE_TEXT_Y (int)(GATE_RECT_Y + GATE_RECT_Y/3)
+#define GATE_TEXT_X (int)(GATE_RECT_X + GATE_RECT_X/4)
+#define GATE_TEXT_Y (int)(GATE_RECT_Y + GATE_RECT_Y/4)
 
 #define LINE_X_START (GATE_RECT_X + GATE_RECT_W)
 #define LINE_Y       (GATE_RECT_Y * 2)
 #define LINE_X_END   (int)(LINE_X_START + WW/5)
 
-#define NOT_INPUTS_COUNT    1
-#define AND_OR_INPUTS_COUNT 2
+#define RADIUS 10
+
+#define AND_INPUTS_COUNT 2
 
 typedef enum {
    GATE_AND = 0,
@@ -50,6 +51,7 @@ typedef struct {
     (ptr)->inputs = (_Bool*)malloc((_input) * sizeof(_Bool));           \
     if ((ptr)->inputs == NULL) {                                        \
         fprintf(stderr, "Inputs allocation failed\n");                  \
+        free((ptr)->inputs);                                            \
         free(ptr);                                                      \
         exit(EXIT_FAILURE);                                             \
     }                                                                   \
@@ -67,15 +69,27 @@ typedef struct {
         }                                       \
 } while(0)
 
+void draw_inputs(GATETYPE type) {
+    if (type == GATE_NOT) {
+        DrawCircleLines(GATE_RECT_X, GATE_RECT_Y * 2, RADIUS, GRAY);
+        DrawLine(GATE_RECT_X - WW / 5, GATE_RECT_Y * 2, GATE_RECT_X, GATE_RECT_Y * 2, GRAY);
+        return;
+    }
+
+    DrawLine(GATE_RECT_X - WW / 5, GATE_RECT_Y * 1.5, GATE_RECT_X, GATE_RECT_Y * 1.5, GRAY);
+    DrawLine(GATE_RECT_X - WW / 5, GATE_RECT_Y * 2.5, GATE_RECT_X, GATE_RECT_Y * 2.5, GRAY);
+
+    return;
+}
+
 _Bool draw_gate(Gate* ptr) {
-    // TODO: draw inputs
+    if (ptr == NULL) {
+        fprintf(stderr, "Ptr is NULL");
+        return false;
+    }
     GATETYPE type = ptr->type;
     if (type < 0 || type > 2) {
         fprintf(stderr, "Type '%d' is not supported\n", type);
-        return false;
-    }
-    if (ptr == NULL) {
-        fprintf(stderr, "Ptr is NULL");
         return false;
     }
     const char* str = NULL;
@@ -95,11 +109,11 @@ _Bool draw_gate(Gate* ptr) {
         default: return false;
     }
 
-
-
     DrawRectangle(GATE_RECT_X, GATE_RECT_Y, GATE_RECT_W, GATE_RECT_H, LIGHTGRAY);
     DrawText(str, GATE_TEXT_X, GATE_TEXT_Y, 25, BLACK);
     DrawLine(LINE_X_START, LINE_Y, LINE_X_END, LINE_Y, GRAY);
+    draw_inputs(ptr->type);
+
     return true;
 }
 
@@ -108,7 +122,7 @@ int main(void) {
     SetTargetFPS(24);
 
     Gate* gate = NULL;
-    ALLOC_GATE(gate, GATE_AND, AND_OR_INPUTS_COUNT);
+    ALLOC_GATE(gate, GATE_AND, AND_INPUTS_COUNT);
 
     Rectangle or  = { 0, BUTTON_Y, BUTTON_WIDTH, BUTTON_HEIGHT};
     Rectangle and = { BUTTON_WIDTH + 5, BUTTON_Y, BUTTON_WIDTH, BUTTON_HEIGHT };
@@ -117,15 +131,9 @@ int main(void) {
     while (!WindowShouldClose()) {
         BeginDrawing();
         ClearBackground(GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR)));
-        if (GuiButton(or, "OR")) {
-            gate->type = GATE_OR;
-        }
-        if (GuiButton(and, "AND")) {
-            gate->type = GATE_AND;
-        }
-        if (GuiButton(not, "NOT")) {
-            gate->type = GATE_NOT;
-        }
+        if (GuiButton(or, "OR")) gate->type = GATE_OR;
+        if (GuiButton(and, "AND")) gate->type = GATE_AND;
+        if (GuiButton(not, "NOT")) gate->type = GATE_NOT;
         if (!draw_gate(gate)) {
             // TODO: handle error
         }
